@@ -32,6 +32,13 @@ for story in user_stories:
             next_index = status.index(task_dict[task.status])
             if next_index < index:
                 index = next_index
+        
+        for story_tag in story.tags:
+            if not task.tags.count(story_tag):
+                task.tags.append(story_tag)
+                task.update()
+
+
                 
     story.status = user_story_dict_inv[status[index]]
     story.update()
