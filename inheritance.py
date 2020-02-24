@@ -59,9 +59,10 @@ for story in tqdm(user_stories, total=total):
                 task.tags.append(story_tag)
                 send(task.update)
                 
-                
-    story.status = user_story_dict_inv[status[index]]
-    send(story.update)
+    new_status = user_story_dict_inv[status[index]]
+    if story.status != new_status:
+        story.status = new_status
+        send(story.update)
 
 
     
