@@ -12,15 +12,15 @@ api.auth(
     password=c.TAIGA_PASSWORD
 )
 
-logging.ingo('Initializing connection and authenticating ...')
+logging.info('Initializing connection and authenticating ...')
 project = api.projects.get_by_slug(c.PROJECT_SLUG)
 
-logging.ingo('Getting user stories ...')
+logging.info('Getting user stories ...')
 user_stories = api.user_stories.list(project=project.id)
 user_story_dict = {x.id: x.name for x in project.list_user_story_statuses()}
 user_story_dict_inv = {x.name: x.id for x in project.list_user_story_statuses()}
 
-logging.ingo('Getting tasks ...')
+logging.info('Getting tasks ...')
 tasks = api.tasks.list(project=project.id)
 task_dict = {x.id: x.name for x in project.list_task_statuses()}
 
