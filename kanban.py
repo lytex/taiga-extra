@@ -20,7 +20,6 @@ current_user_stories = list(filter(lambda x: x.milestone == current_sprint.id, u
 
 tag = 'current_sprint'
 
-
 for story in current_user_stories:
     story_with_tag = list(filter(lambda x: x[0] == tag, story.tags))
     if not story_with_tag:
@@ -33,12 +32,5 @@ old_user_stories = list(filter(lambda x: x.milestone != current_sprint.id, user_
 for story in old_user_stories:
     story_with_tag = list(filter(lambda x: x[0] == tag, story.tags))
     if story_with_tag:
-        print(story.tags)
-        story.tags.remove([tag, None])
+        story.milestone = current_sprint.id
         story.update()
-        print(story.tags)
-
-
-
-
-# ejemplo de tags: [['urgencias', '#f57900'], ['prueba1', None]]
