@@ -49,7 +49,7 @@ for story in user_stories:
                 
     new_status = user_story_dict_inv[status[index]]
     if story.status != new_status:
-        logging.debug(f'{status.subject} is updating to status {status[index]} from {user_story_dict[story.status]}')
+        logging.debug(f'{story.subject} is updating from status {user_story_dict[story.status]} to {status[index]} ')
         story.status = new_status
         send(story.update)
 
