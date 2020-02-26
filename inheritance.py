@@ -1,24 +1,9 @@
 from taiga import TaigaAPI
-from taiga.exceptions import TaigaRestException 
 import config as c
-from time import sleep
-from tqdm import tqdm
-import re
+import logging
+from send import send
 
-def wait(t):
-    real = 1.1*t + 10
-    print('Sleep for ', real, ' seconds')
-    sleep(real)
-
-def send(func):
-    sent = False
-    while not sent:
-        try:
-            func()
-            sent = True
-        except TaigaRestException as e:
-            t = int(re.search('[0-9]+', e.args[0])[0])
-            wait(t)
+logging.basicConfig(level=logging.DEBUG)
 
 api = TaigaAPI()
 
@@ -27,14 +12,15 @@ api.auth(
     password=c.TAIGA_PASSWORD
 )
 
-print('Initializing connection and authenticating ...', flush=True)
+logging.ingo('Initializing connection and authenticating ...')
 project = api.projects.get_by_slug(c.PROJECT_SLUG)
 
-print('Getting user stories ...', flush=True)
+logging.ingo('Getting user stories ...')
 user_stories = api.user_stories.list(project=project.id)
+user_story_dict = {x.id: x.name for x in project.list_user_story_statuses()}
 user_story_dict_inv = {x.name: x.id for x in project.list_user_story_statuses()}
 
-print('Getting tasks ...', flush=True)
+logging.ingo('Getting tasks ...')
 tasks = api.tasks.list(project=project.id)
 task_dict = {x.id: x.name for x in project.list_task_statuses()}
 
@@ -45,10 +31,11 @@ assert status == status2, "Task statuses and user statuses must be the same"
 
 total = len(user_stories)
 
-for story in tqdm(user_stories, total=total):
+for story in user_stories:
+    childs = [x for x in tasks if x.user_story == story.id]
     # Assume statuses are ordered from "less" done to "more" done
-    index = len(status)-1
-    for task in tasks:
+    index = len(status)-1 if childs else status.index(user_story_dict[story.status])
+    for task in childs:
         if task.user_story == story.id:
             next_index = status.index(task_dict[task.status])
             if next_index < index:
@@ -56,11 +43,13 @@ for story in tqdm(user_stories, total=total):
         
         for story_tag in story.tags:
             if not task.tags.count(story_tag):
+                logging.debug(f'{task.subject} is inheriting tag {story_tag} from\n\t{story.subject}')
                 task.tags.append(story_tag)
                 send(task.update)
                 
     new_status = user_story_dict_inv[status[index]]
     if story.status != new_status:
+        logging.debug(f'{status.subject} is updating to status {status[index]} from {user_story_dict[story.status]}')
         story.status = new_status
         send(story.update)
 
