@@ -12,10 +12,10 @@ api.auth(
     password=c.TAIGA_PASSWORD
 )
 
-logger.info('Initializing connection and authenticating ...')
+logging.info('Initializing connection and authenticating ...')
 project = api.projects.get_by_slug(c.PROJECT_SLUG)
 
-logger.info('Getting user stories ...')
+logging.info('Getting user stories ...')
 user_stories = api.user_stories.list(project=project.id)
 
 current_sprint = list(filter(lambda x: not x.closed, project.milestones))[0]
