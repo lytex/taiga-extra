@@ -13,7 +13,7 @@ def send(func):
         try:
             func()
             sent = True
-            input('Next')
+            # input('Next')
         except TaigaRestException as e:
             t = int(re.search('[0-9]+', e.args[0])[0])
             wait(t)
