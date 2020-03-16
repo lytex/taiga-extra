@@ -46,7 +46,10 @@ for story in user_stories:
                 logging.debug(f'{task.subject} is inheriting tag {story_tag} from\n\t{story.subject}')
                 task.tags.append(story_tag)
                 send(task.update)
-                
+
+
+    user_story_list = list(user_story_dict_inv.values())
+    index = [i for i, x in enumerate(user_story_list) if x == story.status][0] # Select index of current status
     new_status = user_story_dict_inv[status[index]]
     if story.status != new_status:
         logging.debug(f'{story.subject} is updating from status {user_story_dict[story.status]} to {status[index]} ')
